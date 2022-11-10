@@ -39,9 +39,15 @@ const String choki = '✌️';
 const String paa = '✋';
 
 class _JankenPageState extends State<JankenPage> {
-  String myHand = goo;
-  String computerHand = goo;
-  String result = '引き分け';
+  String myHand = '';
+  String computerHand = '';
+  String result = '';
+
+  int _computer = 0;
+  int _me = 0;
+  int _total = 1;
+  bool _visible1 = false;
+  bool _visible2 = true;
 
   void selectHand(String selectedHand) {
     myHand = selectedHand;
@@ -59,12 +65,27 @@ class _JankenPageState extends State<JankenPage> {
   void judge() {
     if (myHand == computerHand) {
       result = '引き分け';
+      setState(() {
+        _total++;
+      });
     } else if (myHand == goo && computerHand == choki ||
         myHand == choki && computerHand == paa ||
         myHand == paa && computerHand == choki) {
+      setState(() {
+        _me++;
+        _total++;
+      });
       result = 'あなたの勝ち';
     } else {
+      setState(() {
+        _computer++;
+        _total++;
+      });
       result = 'あなたの負け';
+    }
+    if (_total == 5) {
+      _visible1 = true;
+      _visible2 = false;
     }
   }
 
@@ -92,79 +113,140 @@ class _JankenPageState extends State<JankenPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              result,
-              style: const TextStyle(
-                fontSize: 32,
+            Visibility(
+              visible: _visible2,
+              child: Text(
+                '$_total 試合目',
+                style: const TextStyle(
+                  fontSize: 40,
+                ),
               ),
             ),
-            const SizedBox(height: 24),
-            Text(
-              computerHand,
-              style: const TextStyle(
-                fontSize: 32,
+            const Text(
+              '相手 VS あなた',
+              style: TextStyle(
+                fontSize: 50,
               ),
             ),
             const SizedBox(height: 12),
-            Text(
-              myHand,
-              style: const TextStyle(
-                fontSize: 32,
+            Visibility(
+                visible: _visible1,
+                child: Column(
+                  children: [
+                    Text(
+                      '$_computer 対 $_me',
+                      style: const TextStyle(
+                        fontSize: 60,
+                      ),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black54,
+                      ),
+                      child: const Text(
+                        'リセット',
+                        style: TextStyle(
+                          fontSize: 50,
+                        ),
+                      ),
+                      onPressed: () {
+                        Reset();
+                      },
+                    ),
+                  ],
+                )),
+            const SizedBox(height: 12),
+            Visibility(
+              visible: _visible2,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    computerHand,
+                    style: const TextStyle(
+                      fontSize: 60,
+                    ),
+                  ),
+                  Text(
+                    result,
+                    style: const TextStyle(
+                      fontSize: 30,
+                    ),
+                  ),
+                  Text(
+                    myHand,
+                    style: const TextStyle(
+                      fontSize: 60,
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    selectHand(
+            const SizedBox(height: 24),
+            Visibility(
+              visible: _visible2,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      selectHand(
+                        goo,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black54,
+                    ),
+                    child: const Text(
                       goo,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black54,
-                  ),
-                  child: const Text(
-                    goo,
-                    style: TextStyle(
-                      fontSize: 50,
+                      style: TextStyle(
+                        fontSize: 50,
+                      ),
                     ),
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    selectHand(choki);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black54,
-                  ),
-                  child: const Text(
-                    choki,
-                    style: TextStyle(
-                      fontSize: 50,
+                  ElevatedButton(
+                    onPressed: () {
+                      selectHand(choki);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black54,
+                    ),
+                    child: const Text(
+                      choki,
+                      style: TextStyle(
+                        fontSize: 50,
+                      ),
                     ),
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    selectHand(paa);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black54,
-                  ),
-                  child: const Text(
-                    paa,
-                    style: TextStyle(
-                      fontSize: 50,
+                  ElevatedButton(
+                    onPressed: () {
+                      selectHand(paa);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black54,
+                    ),
+                    child: const Text(
+                      paa,
+                      style: TextStyle(
+                        fontSize: 50,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  void Reset() {
+    _computer = 0;
+    _me = 0;
+    _total = 1;
+    _visible1 = false;
+    _visible2 = true;
+    setState(() {});
   }
 }
